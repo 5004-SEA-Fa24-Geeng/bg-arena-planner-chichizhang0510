@@ -84,7 +84,7 @@ public class GameList implements IGameList {
      * @throws IllegalArgumentException If an invalid format is encountered.
      */
     @Override
-    public void addToList(String str, Stream<BoardGame> filtered){
+    public void addToList(String str, Stream<BoardGame> filtered) {
         if ("all".equalsIgnoreCase(str)) {
             games.addAll(filtered.collect(Collectors.toSet()));
         } else {

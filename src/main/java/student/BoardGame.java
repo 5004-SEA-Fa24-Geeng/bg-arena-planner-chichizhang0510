@@ -8,7 +8,7 @@ import java.util.Objects;
  * This class is considered immutable, as every value is both final, and can only be accessed
  * through getters.
  */
-public class BoardGame implements Comparable<BoardGame>{
+public class BoardGame implements Comparable<BoardGame> {
     /** Name of the board game. */
     private final String name;
     /** Unique identifier of the board game. */
@@ -211,8 +211,12 @@ public class BoardGame implements Comparable<BoardGame>{
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         BoardGame that = (BoardGame) obj;
         return name.equalsIgnoreCase(that.name);
     }

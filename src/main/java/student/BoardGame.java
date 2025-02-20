@@ -1,9 +1,6 @@
 package student;
 
-
-import java.util.List;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * Data Class for the Board Game Object.
@@ -11,7 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * This class is considered immutable, as every value is both final, and can only be accessed
  * through getters.
  */
-public class BoardGame {
+public class BoardGame implements Comparable<BoardGame>{
     /** Name of the board game. */
     private final String name;
     /** Unique identifier of the board game. */
@@ -214,9 +211,10 @@ public class BoardGame {
      */
     @Override
     public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj, // exclude the following fields
-                List.of("minPlayers", "maxPlayers", "maxPlayTime", "minPlayTime", "difficulty",
-                        "rank", "averageRating", "yearPublished"));
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        BoardGame that = (BoardGame) obj;
+        return name.equalsIgnoreCase(that.name);
     }
 
     /**
@@ -229,11 +227,20 @@ public class BoardGame {
      */
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, // exclude the following fields
-                List.of("minPlayers", "maxPlayers", "maxPlayTime", "minPlayTime", "difficulty",
-                        "rank", "averageRating", "yearPublished"));
+        return Objects.hash(name.toLowerCase());
     }
 
+    /**
+     * Compares this board game to another board game based on name (case-insensitive).
+     *
+     * @param other The other {@code BoardGame} to compare against.
+     * @return A negative integer, zero, or a positive integer if this game's name is less than,
+     *         equal to, or greater than the other game's name, respectively.
+     */
+    @Override
+    public int compareTo(BoardGame other) {
+        return this.name.compareToIgnoreCase(other.name);
+    }
 
     /**
      * Simple main we used for testing.

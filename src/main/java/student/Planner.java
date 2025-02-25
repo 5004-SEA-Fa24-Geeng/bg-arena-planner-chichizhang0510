@@ -170,6 +170,7 @@ public class Planner implements IPlanner {
             case "maxplaytime": return game.getMaxPlayTime();
             case "difficulty": return game.getDifficulty();
             case "rating": return game.getRating();
+            case "rank": return game.getRank();
             default: throw new IllegalArgumentException("Invalid field: " + field);
         }
     }

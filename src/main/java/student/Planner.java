@@ -200,7 +200,9 @@ public class Planner implements IPlanner {
 
         if (sortOn == GameData.RATING) {
             comparator = Comparator.comparingDouble(BoardGame::getRating);
-        } else if (sortOn == GameData.DIFFICULTY) {
+        } else if (sortOn == GameData.ID){
+            comparator = Comparator.comparingInt(BoardGame::getId);
+        }else if (sortOn == GameData.DIFFICULTY) {
             comparator = Comparator.comparingDouble(BoardGame::getDifficulty);
         } else if (sortOn == GameData.MIN_PLAYERS) {
             comparator = Comparator.comparingInt(BoardGame::getMinPlayers);

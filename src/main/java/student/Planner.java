@@ -198,23 +198,22 @@ public class Planner implements IPlanner {
             sortOn = GameData.YEAR;
         }
 
-        if (sortOn == GameData.RATING) {
-            comparator = Comparator.comparingDouble(BoardGame::getRating);
-        } else if (sortOn == GameData.ID){
-            comparator = Comparator.comparingInt(BoardGame::getId);
-        }else if (sortOn == GameData.DIFFICULTY) {
-            comparator = Comparator.comparingDouble(BoardGame::getDifficulty);
-        } else if (sortOn == GameData.MIN_PLAYERS) {
-            comparator = Comparator.comparingInt(BoardGame::getMinPlayers);
-        } else if (sortOn == GameData.MAX_PLAYERS) {
-            comparator = Comparator.comparingInt(BoardGame::getMaxPlayers);
-        } else if (sortOn == GameData.MIN_TIME) {
-            comparator = Comparator.comparingInt(BoardGame::getMinPlayTime);
-        } else if (sortOn == GameData.MAX_TIME) {
-            comparator = Comparator.comparingInt(BoardGame::getMaxPlayTime);
-        } else {
-            throw new IllegalArgumentException("Invalid sorting field");
-        }
+        comparator = switch (sortOn) {
+            case ID -> Comparator.comparingInt(BoardGame::getId);
+            case RATING -> Comparator.comparingDouble(BoardGame::getRating);
+            case DIFFICULTY -> Comparator.comparingDouble(BoardGame::getDifficulty);
+            case MIN_PLAYERS -> Comparator.comparingInt(BoardGame::getMinPlayers);
+            case MAX_PLAYERS -> Comparator.comparingInt(BoardGame::getMaxPlayers);
+            case MIN_TIME -> Comparator.comparingInt(BoardGame::getMinPlayTime);
+            case MAX_TIME -> Comparator.comparingInt(BoardGame::getMaxPlayTime);
+            case RANK -> Comparator.comparingInt(BoardGame::getRank);
+            case YEAR -> Comparator.comparingInt(BoardGame::getYearPublished);
+            case NAME -> Comparator.comparing(BoardGame::getName, String.CASE_INSENSITIVE_ORDER);
+            default -> {
+//                System.out.println("Sorting field received: " + sortOn);
+                throw new IllegalArgumentException("Invalid sorting field: " + sortOn);
+            }
+        };
 
         if (!ascending) {
             comparator = comparator.reversed();

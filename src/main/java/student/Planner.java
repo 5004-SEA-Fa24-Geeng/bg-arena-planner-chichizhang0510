@@ -9,6 +9,10 @@ import java.util.stream.Stream;
  * and is responsible for filtering and sorting board games based on user-defined criteria.
  */
 public class Planner implements IPlanner {
+    /**
+     * Constant string representing the keyword used to add or remove all filtered
+     * games from the list.
+     */
     private static final String ADD_ALL = "all";
 
     /** The complete set of all available board games for filtering and sorting. */

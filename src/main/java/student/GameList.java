@@ -96,7 +96,9 @@ public class GameList implements IGameList {
      */
     @Override
     public void addToList(String str, Stream<BoardGame> filtered) throws IllegalArgumentException {
-        List<BoardGame> filteredList = filtered.sorted(Comparator.comparing(BoardGame::getName, String.CASE_INSENSITIVE_ORDER))
+        List<BoardGame> filteredList = filtered.sorted(Comparator.
+                        comparing(BoardGame::getName,
+                        String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
         if (ADD_ALL.equalsIgnoreCase(str)) {

@@ -1,7 +1,9 @@
 package student;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,18 +59,27 @@ public class GameList implements IGameList {
     }
 
     /**
-     * Saves the game list to a file.
-     * Each game's name is written to a new line in the specified file.
+     * Saves the list of games to a file.
+     * <p>
+     * The file will be overwritten if it already exists. Each game's name is written
+     * on a new line in **ascending order ignoring case**, as specified by `getGameNames()`.
      *
-     * @param filename The name of the file to save the game list to.
+     * @param filename The name of the file to save the list to.
      * @throws RuntimeException If an I/O error occurs while writing the file.
      */
     @Override
     public void saveGame(String filename) {
-        try (FileWriter writer = new FileWriter(filename)) {
-            for (String name : getGameNames()) {
-                writer.write(name + "\n");
+        Path filePath = Path.of(filename); // Convert filename to a Path object
+
+        try {
+            // Ensure the directory exists
+            if (filePath.getParent() != null) {
+                Files.createDirectories(filePath.getParent());
             }
+
+            // Get the sorted game names and write to file
+            List<String> gameNames = getGameNames();
+            Files.write(filePath, gameNames, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file: " + filename, e);
         }

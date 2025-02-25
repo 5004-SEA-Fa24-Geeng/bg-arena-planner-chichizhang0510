@@ -71,6 +71,10 @@ public class Planner implements IPlanner {
      */
     @Override
     public Stream<BoardGame> filter(String filter, GameData sortOn, boolean ascending) {
+        if (sortOn.name().equalsIgnoreCase("yearPublished")) {
+            sortOn = GameData.YEAR;
+        }
+
         return filter(filter)
                 .sorted(getComparator(sortOn, ascending));
     }
@@ -189,6 +193,10 @@ public class Planner implements IPlanner {
      */
     private Comparator<BoardGame> getComparator(GameData sortOn, boolean ascending) {
         Comparator<BoardGame> comparator;
+
+        if (sortOn.name().equalsIgnoreCase("yearPublished")) {
+            sortOn = GameData.YEAR;
+        }
 
         if (sortOn == GameData.RATING) {
             comparator = Comparator.comparingDouble(BoardGame::getRating);

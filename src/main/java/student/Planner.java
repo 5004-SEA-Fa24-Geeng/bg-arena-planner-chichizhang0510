@@ -113,6 +113,10 @@ public class Planner implements IPlanner {
      * @throws IllegalArgumentException If the filter format is invalid.
      */
     private boolean applyFilter(BoardGame game, String filter) {
+        if (filter == null || filter.trim().isEmpty()) {
+            return true;  // If filter is empty, return true (don't filter anything)
+        }
+
         filter = filter.trim();
         String[] operators = {">=", "<=", ">", "<", "==", "!=", "~="};
 

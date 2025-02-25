@@ -9,6 +9,8 @@ import java.util.stream.Stream;
  * and is responsible for filtering and sorting board games based on user-defined criteria.
  */
 public class Planner implements IPlanner {
+    private static final String ADD_ALL = "all";
+
     /** The complete set of all available board games for filtering and sorting. */
     private final Set<BoardGame> allGames;
 
@@ -33,19 +35,13 @@ public class Planner implements IPlanner {
      */
     @Override
     public Stream<BoardGame> filter(String filter) {
-        if (filter.equalsIgnoreCase("all")) {
+        if (ADD_ALL.equalsIgnoreCase(filter)) {
             return filteredGames.stream();
         }
 
-        List<BoardGame> result = new ArrayList<>();
-
-        for (BoardGame game : filteredGames) {
-            if (applyFilter(game, filter)) {
-                result.add(game);
-            }
-        }
-
-        return result.stream();
+        return filteredGames.stream()
+                .filter(game -> applyFilters(game, filter))
+                .sorted(Comparator.comparing(BoardGame::getName, String.CASE_INSENSITIVE_ORDER));
     }
 
     /**
@@ -71,16 +67,8 @@ public class Planner implements IPlanner {
      */
     @Override
     public Stream<BoardGame> filter(String filter, GameData sortOn, boolean ascending) {
-        List<BoardGame> result = new ArrayList<>();
-
-        for (BoardGame game : filteredGames) {
-            if (applyFilter(game, filter)) {
-                result.add(game);
-            }
-        }
-
-        result.sort(getComparator(sortOn, ascending));
-        return result.stream();
+        return filter(filter)
+                .sorted(getComparator(sortOn, ascending));
     }
 
     /**
@@ -92,46 +80,69 @@ public class Planner implements IPlanner {
     }
 
     /**
-     * Applies a filtering condition to determine if a board game matches the criteria.
+     * Applies multiple filtering conditions to a given board game.
+     * The filter string contains multiple conditions separated by commas,
+     * and the game must satisfy all conditions to be included.
+     *
+     * @param game   The board game to check.
+     * @param filter The filtering condition string.
+     * @return {@code true} if the game matches all filters, otherwise {@code false}.
+     */
+    private boolean applyFilters(BoardGame game, String filter) {
+        String[] conditions = filter.split(",");
+        for (String condition : conditions) {
+            if (!applyFilter(game, condition.trim())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Applies a single filtering condition to a board game.
+     * Supports numerical comparisons (>, <, >=, <=, ==, !=) and
+     * string-based filtering for names (==, !=, ~=).
      *
      * @param game   The board game to check.
      * @param filter The filtering condition string.
      * @return {@code true} if the game matches the filter, otherwise {@code false}.
+     * @throws IllegalArgumentException If the filter format is invalid.
      */
     private boolean applyFilter(BoardGame game, String filter) {
-        if (filter.equalsIgnoreCase("all")) {
-            return true;
+        filter = filter.trim().toLowerCase();
+        String[] operators = {">=", "<=", ">", "<", "==", "!=", "~="};
+
+        for (String op : operators) {
+            if (filter.contains(op)) {
+                String[] parts = filter.split(op);
+                String field = parts[0].trim();
+                String value = parts[1].trim();
+
+                if (field.equalsIgnoreCase("name")) {
+                    return switch (op) {
+                        case "==" -> game.getName().equalsIgnoreCase(value);
+                        case "!=" -> !game.getName().equalsIgnoreCase(value);
+                        case "~=" -> game.getName().toLowerCase().contains(value.toLowerCase());
+                        default -> throw new IllegalArgumentException("Invalid operator for string field: " + op);
+                    };
+                }
+
+                double fieldValue = getFieldValue(game, field);
+                double filterValue = Double.parseDouble(value);
+
+                return switch (op) {
+                    case ">" -> fieldValue > filterValue;
+                    case "<" -> fieldValue < filterValue;
+                    case ">=" -> fieldValue >= filterValue;
+                    case "<=" -> fieldValue <= filterValue;
+                    case "==" -> fieldValue == filterValue;
+                    case "!=" -> fieldValue != filterValue;
+                    default -> throw new IllegalArgumentException("Invalid operator: " + op);
+                };
+            }
         }
 
-        if (filter.startsWith("name ==")) {
-            String nameValue = filter.substring(8).trim();
-            return game.getName().equalsIgnoreCase(nameValue);
-        }
-
-        if (filter.contains("=") && !filter.contains(">") && !filter.contains("<")) {
-            String[] parts = filter.split("=");
-            return game.getName().equalsIgnoreCase(parts[1].trim());
-        } else if (filter.contains(">=")) {
-            String[] parts = filter.split(">=");
-            return getFieldValue(game, parts[0].trim()) >= Double.parseDouble(parts[1].trim());
-        } else if (filter.contains("<=")) {
-            String[] parts = filter.split("<=");
-            return getFieldValue(game, parts[0].trim()) <= Double.parseDouble(parts[1].trim());
-        } else if (filter.contains(">")) {
-            String[] parts = filter.split(">");
-            return getFieldValue(game, parts[0].trim()) > Double.parseDouble(parts[1].trim());
-        } else if (filter.contains("<")) {
-            String[] parts = filter.split("<");
-            return getFieldValue(game, parts[0].trim()) < Double.parseDouble(parts[1].trim());
-        } else if (filter.contains("!=")) {
-            String[] parts = filter.split("!=");
-            return getFieldValue(game, parts[0].trim()) != Double.parseDouble(parts[1].trim());
-        } else if (filter.contains("~=")) {
-            String[] parts = filter.split("~=");
-            return Math.abs(getFieldValue(game, parts[0].trim()) - Double.parseDouble(parts[1].trim())) < 0.1;
-        } else {
-            throw new IllegalArgumentException("Invalid filter format");
-        }
+        throw new IllegalArgumentException("Invalid filter format: " + filter);
     }
 
     /**

@@ -1,6 +1,9 @@
 package student;
 
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.List;
 
 /**
  * Data Class for the Board Game Object.
@@ -211,14 +214,9 @@ public class BoardGame implements Comparable<BoardGame> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        BoardGame that = (BoardGame) obj;
-        return name.equalsIgnoreCase(that.name);
+        return EqualsBuilder.reflectionEquals(this, obj, // exclude the following fields
+                List.of("minPlayers", "maxPlayers", "maxPlayTime", "minPlayTime", "difficulty",
+                        "rank", "averageRating", "yearPublished"));
     }
 
     /**
@@ -231,7 +229,9 @@ public class BoardGame implements Comparable<BoardGame> {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(name.toLowerCase());
+        return HashCodeBuilder.reflectionHashCode(this, // exclude the following fields
+                List.of("minPlayers", "maxPlayers", "maxPlayTime", "minPlayTime", "difficulty",
+                        "rank", "averageRating", "yearPublished"));
     }
 
     /**

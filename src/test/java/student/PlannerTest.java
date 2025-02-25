@@ -3,7 +3,6 @@ package student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,6 +43,12 @@ class PlannerTest {
     }
 
     @Test
+    void testFilterByMultipleConditions() {
+        Stream<BoardGame> filtered = planner.filter("minPlayers>1, rating>=4.3");
+        assertEquals(2, filtered.count());
+    }
+
+    @Test
     void testSortByRatingAscending() {
         Stream<BoardGame> sorted = planner.filter("all", GameData.RATING, true);
         BoardGame[] sortedGames = sorted.toArray(BoardGame[]::new);
@@ -55,6 +60,20 @@ class PlannerTest {
         Stream<BoardGame> sorted = planner.filter("all", GameData.RATING, false);
         BoardGame[] sortedGames = sorted.toArray(BoardGame[]::new);
         assertEquals("Orange", sortedGames[0].getName());
+    }
+
+    @Test
+    void testSortByMinPlayersAscending() {
+        Stream<BoardGame> sorted = planner.filter("all", GameData.MIN_PLAYERS, true);
+        BoardGame[] sortedGames = sorted.toArray(BoardGame[]::new);
+        assertEquals("Orange", sortedGames[0].getName());
+    }
+
+    @Test
+    void testSortByMinPlayersDescending() {
+        Stream<BoardGame> sorted = planner.filter("all", GameData.MIN_PLAYERS, false);
+        BoardGame[] sortedGames = sorted.toArray(BoardGame[]::new);
+        assertEquals("Apple", sortedGames[0].getName());
     }
 
     @Test

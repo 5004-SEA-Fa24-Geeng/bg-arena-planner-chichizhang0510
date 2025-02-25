@@ -13,21 +13,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameListTest {
     private GameList gameList;
+    private Stream<BoardGame> games;
 
     @BeforeEach
     void setUp() {
         gameList = new GameList();
+        games = Stream.of(
+                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995),
+                new BoardGame("Banana", 2, 2, 4, 45, 30, 1.8, 5, 4.3, 2017),
+                new BoardGame("Orange", 3, 1, 5, 120, 90, 3.2, 10, 4.7, 2016)
+        );
     }
 
     @Test
     void getGameNames() {
-        gameList.addToList("Apple", Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995)));
-        gameList.addToList("Banana", Stream.of(
-                new BoardGame("Banana", 2, 2, 4, 45, 30, 1.8, 5, 4.3, 2017)));
-        gameList.addToList("Orange", Stream.of(
-                new BoardGame("Orange", 3, 1, 5, 120, 90, 3.2, 10, 4.7, 2016)));
-
+        gameList.addToList("all", games);
         List<String> gameNames = gameList.getGameNames();
         assertEquals(3, gameNames.size());
         assertEquals(List.of("Apple", "Banana", "Orange"), gameNames);
@@ -35,8 +35,7 @@ class GameListTest {
 
     @Test
     void clear() {
-        gameList.addToList("Apple", Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995)));
+        gameList.addToList("all", games);
         gameList.clear();
         assertEquals(0, gameList.count());
     }
@@ -44,18 +43,13 @@ class GameListTest {
     @Test
     void count() {
         assertEquals(0, gameList.count());
-        gameList.addToList("Apple", Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995)));
+        gameList.addToList("Apple", Stream.of(new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995)));
         assertEquals(1, gameList.count());
     }
 
     @Test
     void saveGame() throws IOException {
-        gameList.addToList("Apple", Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995)));
-        gameList.addToList("Banana", Stream.of(
-                new BoardGame("Banana", 2, 2, 4, 45, 30, 1.8, 5, 4.3, 2017)));
-
+        gameList.addToList("all", games);
         String filename = "test_game_list.txt";
         gameList.saveGame(filename);
 
@@ -63,30 +57,46 @@ class GameListTest {
         assertTrue(file.exists());
 
         List<String> lines = Files.readAllLines(file.toPath());
-        assertEquals(List.of("Apple", "Banana"), lines);
+        assertEquals(List.of("Apple", "Banana", "Orange"), lines);
 
         file.delete();
     }
 
     @Test
-    void addToList() {
-        Stream<BoardGame> games = Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995),
-                new BoardGame("Banana", 2, 2, 4, 45, 30, 1.8, 5, 4.3, 2017)
-        );
-        gameList.addToList("all", games);
-        assertEquals(2, gameList.count());
+    void addToListByIndex() {
+        gameList.addToList("1", games);
+        assertEquals(1, gameList.count());
+        assertEquals(List.of("Apple"), gameList.getGameNames());
     }
 
     @Test
-    void removeFromList() {
-        Stream<BoardGame> games = Stream.of(
-                new BoardGame("Apple", 1, 3, 4, 60, 30, 2.5, 1, 4.5, 1995),
-                new BoardGame("Banana", 2, 2, 4, 45, 30, 1.8, 5, 4.3, 2017)
-        );
+    void addToListByRange() {
+        gameList.addToList("1-2", games);
+        assertEquals(2, gameList.count());
+        assertTrue(gameList.getGameNames().containsAll(List.of("Apple", "Banana")));
+    }
+
+    @Test
+    void removeFromListByName() {
         gameList.addToList("all", games);
         gameList.removeFromList("Apple");
-        assertEquals(1, gameList.count());
+        assertEquals(2, gameList.count());
         assertFalse(gameList.getGameNames().contains("Apple"));
+    }
+
+    @Test
+    void removeFromListByIndex() {
+        gameList.addToList("all", games);
+        gameList.removeFromList("1");
+        assertEquals(2, gameList.count());
+        assertFalse(gameList.getGameNames().contains("Apple"));
+    }
+
+    @Test
+    void removeFromListByRange() {
+        gameList.addToList("all", games);
+        gameList.removeFromList("1-2");
+        assertEquals(1, gameList.count());
+        assertTrue(gameList.getGameNames().contains("Orange"));
     }
 }

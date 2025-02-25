@@ -171,6 +171,7 @@ public class Planner implements IPlanner {
             case "difficulty": return game.getDifficulty();
             case "rating": return game.getRating();
             case "rank": return game.getRank();
+            case "yearpublished": return game.getYearPublished();
             default: throw new IllegalArgumentException("Invalid field: " + field);
         }
     }

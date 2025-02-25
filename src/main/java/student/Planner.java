@@ -163,7 +163,7 @@ public class Planner implements IPlanner {
      * @return The numerical value of the specified field.
      */
     private double getFieldValue(BoardGame game, String field) {
-        switch (field.toLowerCase()) {
+        switch (field.toLowerCase().replace("_", "")) {
             case "minplayers": return game.getMinPlayers();
             case "maxplayers": return game.getMaxPlayers();
             case "minplaytime": return game.getMinPlayTime();

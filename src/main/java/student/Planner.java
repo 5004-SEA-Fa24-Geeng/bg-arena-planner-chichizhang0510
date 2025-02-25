@@ -113,7 +113,7 @@ public class Planner implements IPlanner {
      * @throws IllegalArgumentException If the filter format is invalid.
      */
     private boolean applyFilter(BoardGame game, String filter) {
-        filter = filter.trim().toLowerCase();
+        filter = filter.trim();
         String[] operators = {">=", "<=", ">", "<", "==", "!=", "~="};
 
         for (String op : operators) {
@@ -122,6 +122,7 @@ public class Planner implements IPlanner {
                 String field = parts[0].trim();
                 String value = parts[1].trim();
 
+                // Handle name field separately (only allows ==, !=, ~=)
                 if (field.equalsIgnoreCase("name")) {
                     return switch (op) {
                         case "==" -> game.getName().equalsIgnoreCase(value);
@@ -131,6 +132,7 @@ public class Planner implements IPlanner {
                     };
                 }
 
+                // Handle numeric comparisons
                 double fieldValue = getFieldValue(game, field);
                 double filterValue = Double.parseDouble(value);
 

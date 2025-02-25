@@ -122,12 +122,16 @@ public class Planner implements IPlanner {
                 String field = parts[0].trim();
                 String value = parts[1].trim();
 
-                // Handle name field separately (only allows ==, !=, ~=)
+                // Handle name field separately (support lexicographical comparison)
                 if (field.equalsIgnoreCase("name")) {
                     return switch (op) {
                         case "==" -> game.getName().equalsIgnoreCase(value);
                         case "!=" -> !game.getName().equalsIgnoreCase(value);
                         case "~=" -> game.getName().toLowerCase().contains(value.toLowerCase());
+                        case ">" -> game.getName().compareToIgnoreCase(value) > 0;  // Lexicographical comparison
+                        case "<" -> game.getName().compareToIgnoreCase(value) < 0;
+                        case ">=" -> game.getName().compareToIgnoreCase(value) >= 0;
+                        case "<=" -> game.getName().compareToIgnoreCase(value) <= 0;
                         default -> throw new IllegalArgumentException("Invalid operator for string field: " + op);
                     };
                 }
